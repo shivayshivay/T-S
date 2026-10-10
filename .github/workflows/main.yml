@@ -2,11 +2,9 @@ name: PhotoMorph CaseVault CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -25,8 +23,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
-          cache-dependency-path: requirements-dev.txt
+
+      - name: Show repository files
+        run: ls -la
 
       - name: Install dependencies
         run: python -m pip install -r requirements-dev.txt
@@ -36,7 +35,7 @@ jobs:
           python -m py_compile app/main.py
           python -m py_compile tests/test_api.py
 
-      - name: Run automated tests
+      - name: Run tests
         run: python -m pytest -v
 
       - name: Build Docker image
