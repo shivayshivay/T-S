@@ -24,19 +24,30 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Show repository files
-        run: ls -la
+      - name: Check ZIP exists
+        run: test -f PhotoMorph-CaseVault-V1.zip
+
+      - name: Extract project
+        run: |
+          unzip -q PhotoMorph-CaseVault-V1.zip -d extracted
+          ls -la extracted/PhotoMorph-CaseVault-V1
 
       - name: Install dependencies
-        run: python -m pip install -r requirements-dev.txt
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r extracted/PhotoMorph-CaseVault-V1/requirements-dev.txt
 
       - name: Check Python syntax
         run: |
-          python -m py_compile app/main.py
-          python -m py_compile tests/test_api.py
+          python -m py_compile extracted/PhotoMorph-CaseVault-V1/app/main.py
+          python -m py_compile extracted/PhotoMorph-CaseVault-V1/tests/test_api.py
 
-      - name: Run tests
+      - name: Run automated tests
+        working-directory: extracted/PhotoMorph-CaseVault-V1
         run: python -m pytest -v
 
       - name: Build Docker image
-        run: docker build -t photomorph-casevault:latest .
+        run: |
+          docker build \
+            -t photomorph-casevault:latest \
+            extracted/PhotoMorph-CaseVault-V1
